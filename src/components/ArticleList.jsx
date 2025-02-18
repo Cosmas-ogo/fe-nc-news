@@ -9,18 +9,19 @@ const ArticleList = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [sortBy, setSortBy] = useState("created_at");
+  const [sortOrder, setSortOrder] = useState("desc");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
     setLoading(true);
     setError(null);
+
     axios
       .get(
-        `https://first-project-o5bz.onrender.com/api/articles?sort_by=${sortBy}&limit=10&page=${currentPage}`
+        `https://first-project-o5bz.onrender.com/api/articles?sort_by=${sortBy}&order=${sortOrder}&limit=10&page=${currentPage}`
       )
       .then((response) => {
-        console.log("API Response:", response.data);
         if (response.data && Array.isArray(response.data.articles)) {
           setArticles(response.data.articles);
           setTotalPages(Math.ceil(response.data.total_count / 10));
@@ -35,21 +36,16 @@ const ArticleList = () => {
       .finally(() => {
         setLoading(false);
       });
-  }, [sortBy, currentPage]);
-
-  if (loading) {
-    return <p className="text-center text-lg font-bold">Loading articles...</p>;
-  }
-
-  if (error) {
-    return (
-      <p className="text-center text-lg font-bold text-red-600">{error}</p>
-    );
-  }
+  }, [sortBy, sortOrder, currentPage]);
 
   return (
     <div className="container mx-auto p-4">
-      <SortOptions setSortBy={setSortBy} />
+      <SortOptions
+        setSortBy={setSortBy}
+        setSortOrder={setSortOrder}
+        sortBy={sortBy}
+        sortOrder={sortOrder}
+      />
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {articles.length > 0 ? (
           articles.map((article) => (
