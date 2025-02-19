@@ -22,3 +22,18 @@ export const postComment = async (articleId, commentText) => {
   );
   return data.comment;
 };
+
+export const updateArticleVotes = async (articleId, voteChange) => {
+  try {
+    const { data } = await axios.patch(`${API_URL}/articles/${articleId}`, {
+      inc_votes: voteChange,
+    });
+    return data.article;
+  } catch (error) {
+    console.error(
+      "Error updating votes:",
+      error.response?.data?.message || error.message
+    );
+    throw new Error(error.response?.data?.message || "Failed to update votes");
+  }
+};

@@ -52,7 +52,9 @@ const ArticleList = () => {
             <ArticlePreview key={article.article_id} {...article} />
           ))
         ) : (
-          <p className="text-center text-lg font-bold">No articles available</p>
+          <p className="text-center text-lg font-bold text-blue-600">
+            No articles available
+          </p>
         )}
       </div>
       <Pagination
