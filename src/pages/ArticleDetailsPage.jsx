@@ -4,29 +4,53 @@ import { getArticleById, getCommentsByArticleId } from "../services/api";
 import ArticleContent from "../components/ArticleContent";
 import CommentsSection from "../components/CommentsSection";
 import RatingControls from "../components/RatingControls";
+import CommentForm from "../components/CommentForm";
 
-const ArticleDetailsPage = () => {
+function ArticleDetailsPage() {
   const { article_id } = useParams();
   const [article, setArticle] = useState(null);
   const [comments, setComments] = useState([]);
+  console.log("Current state of comments:", comments);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     getArticleById(article_id)
       .then(setArticle)
-      .catch((error) => console.error("Error fetching article:", error));
+      .catch(() => {
+        setError("Failed to load article.");
+      });
 
     getCommentsByArticleId(article_id)
-      .then(setComments)
-      .catch((error) => console.error("Error fetching comments:", error));
+      .then((fetchedComments) => {
+        setComments((prevComments) => {
+          const existingCommentIds = new Set(
+            prevComments.map((c) => c.comment_id)
+          );
+          const newUniqueComments = fetchedComments.filter(
+            (c) => !existingCommentIds.has(c.comment_id)
+          );
+          return [...prevComments, ...newUniqueComments];
+        });
+      })
+      .catch(() => setError("Failed to load comments."));
   }, [article_id]);
 
-  const handleVoteUpdate = (newVotes) => {
+  function handleVoteUpdate(newVotes) {
     setArticle((prevArticle) => ({
       ...prevArticle,
       votes: newVotes,
     }));
-  };
+  }
 
+  function handleNewComment(newComment) {
+    setComments((prevComments) => [newComment, ...prevComments]);
+
+    setTimeout(() => {
+      getCommentsByArticleId(article_id).then(setComments);
+    }, 1000);
+  }
+
+  if (error) return <p className="text-red-500">{error}</p>;
   if (!article) return <p>Loading article...</p>;
 
   return (
@@ -44,9 +68,10 @@ const ArticleDetailsPage = () => {
         />
       </div>
 
+      <CommentForm articleId={article_id} onCommentAdded={handleNewComment} />
       <CommentsSection comments={comments} articleId={article_id} />
     </div>
   );
-};
+}
 
 export default ArticleDetailsPage;
