@@ -1,35 +1,55 @@
 import { useState } from "react";
 import { postComment } from "../services/api";
 
-const CommentForm = ({ articleId }) => {
+function CommentForm({ articleId, onCommentAdded }) {
   const [commentText, setCommentText] = useState("");
+  const [username, setUsername] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [success, setSuccess] = useState("");
 
-  const handleSubmit = (e) => {
+  function handleSubmit(e) {
     e.preventDefault();
-    if (!commentText.trim()) return;
+    if (!commentText.trim() || !username.trim()) {
+      return;
+    }
 
     setIsSubmitting(true);
-    postComment(articleId, commentText)
+    setSuccess("");
+
+    postComment(articleId, username, commentText, onCommentAdded, setSuccess)
       .then(() => {
         setCommentText("");
-        setIsSubmitting(false);
-        window.location.reload();
+        setUsername("");
       })
-      .catch(() => setIsSubmitting(false));
-  };
+      .catch((error) => {
+        console.error("Error posting comment:", error);
+      })
+      .finally(() => {
+        setIsSubmitting(false);
+      });
+  }
 
   return (
     <form
       onSubmit={handleSubmit}
       className="bg-gray-200 p-4 rounded-lg shadow-sm"
     >
-      <textarea
+      <input
+        type="text"
         className="w-full p-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-600"
+        placeholder="Your Name"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+        required
+        disabled={isSubmitting}
+      />
+      <textarea
+        className="w-full p-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-600 mt-2"
         placeholder="Write a comment..."
         value={commentText}
         onChange={(e) => setCommentText(e.target.value)}
         required
+        disabled={isSubmitting}
       ></textarea>
       <button
         type="submit"
@@ -38,8 +58,9 @@ const CommentForm = ({ articleId }) => {
       >
         {isSubmitting ? "Posting..." : "Post Comment"}
       </button>
+      {success && <p className="text-green-500 mt-2">{success}</p>}
     </form>
   );
-};
+}
 
 export default CommentForm;

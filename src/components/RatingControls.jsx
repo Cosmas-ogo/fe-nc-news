@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { updateArticleVotes } from "../services/api";
 
-const RatingControls = ({ articleId, initialVotes, onVoteUpdate }) => {
+function RatingControls({ articleId, initialVotes, onVoteUpdate }) {
   const [votes, setVotes] = useState(initialVotes);
   const [userVote, setUserVote] = useState(0);
   const [error, setError] = useState(null);
   const [isVoting, setIsVoting] = useState(false);
 
-  const handleVote = async (change) => {
+  async function handleVote(change) {
     if (isVoting) return;
 
     let voteChange = 0;
@@ -38,7 +38,7 @@ const RatingControls = ({ articleId, initialVotes, onVoteUpdate }) => {
     } finally {
       setIsVoting(false);
     }
-  };
+  }
 
   return (
     <div className="flex items-center gap-2">
@@ -64,6 +64,6 @@ const RatingControls = ({ articleId, initialVotes, onVoteUpdate }) => {
       {error && <p className="text-red-500 text-sm">{error}</p>}
     </div>
   );
-};
+}
 
 export default RatingControls;

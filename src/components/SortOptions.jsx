@@ -8,15 +8,15 @@ const sortLabels = {
   article_id: "Sort by ID",
 };
 
-const SortOptions = ({ setSortBy, setSortOrder, sortBy, sortOrder }) => {
-  const toggleSortOrder = (field) => {
+function SortOptions({ setSortBy, setSortOrder, sortBy, sortOrder }) {
+  function toggleSortOrder(field) {
     if (sortBy === field) {
       setSortOrder((prevOrder) => (prevOrder === "asc" ? "desc" : "asc"));
     } else {
       setSortBy(field);
       setSortOrder("asc");
     }
-  };
+  }
 
   return (
     <div className="flex flex-col items-center space-y-4 mb-6">
@@ -86,6 +86,6 @@ const SortOptions = ({ setSortBy, setSortOrder, sortBy, sortOrder }) => {
       </div>
     </div>
   );
-};
+}
 
 export default SortOptions;

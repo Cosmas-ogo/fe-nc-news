@@ -4,7 +4,7 @@ import ArticlePreview from "./ArticlePreview";
 import Pagination from "./Pagination";
 import SortOptions from "./SortOptions";
 
-const ArticleList = () => {
+function ArticleList() {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -30,7 +30,6 @@ const ArticleList = () => {
         }
       })
       .catch((error) => {
-        console.error("Error fetching articles:", error);
         setError("Failed to load articles. Please try again later.");
       })
       .finally(() => {
@@ -46,17 +45,25 @@ const ArticleList = () => {
         sortBy={sortBy}
         sortOrder={sortOrder}
       />
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {articles.length > 0 ? (
-          articles.map((article) => (
-            <ArticlePreview key={article.article_id} {...article} />
-          ))
-        ) : (
-          <p className="text-center text-lg font-bold text-blue-600">
-            No articles available
-          </p>
-        )}
-      </div>
+      {loading ? (
+        <p className="text-center text-lg font-bold text-blue-600">
+          Loading articles...
+        </p>
+      ) : error ? (
+        <p className="text-center text-lg font-bold text-red-600">{error}</p>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {articles.length > 0 ? (
+            articles.map((article) => (
+              <ArticlePreview key={article.article_id} {...article} />
+            ))
+          ) : (
+            <p className="text-center text-lg font-bold text-blue-600">
+              No articles available
+            </p>
+          )}
+        </div>
+      )}
       <Pagination
         currentPage={currentPage}
         totalPages={totalPages}
@@ -64,6 +71,6 @@ const ArticleList = () => {
       />
     </div>
   );
-};
+}
 
 export default ArticleList;
