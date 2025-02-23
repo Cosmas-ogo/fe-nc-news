@@ -1,7 +1,6 @@
 import Comment from "./Comment";
 
-function CommentsSection({ comments }) {
-  console.log("Rendering CommentsSection. Current Comments List:", comments);
+function CommentsSection({ comments, onDelete }) {
   return (
     <div className="mt-6 bg-white p-6 rounded-lg shadow-md">
       <h2 className="text-2xl font-semibold text-gray-900 mb-4">
@@ -13,6 +12,7 @@ function CommentsSection({ comments }) {
             <Comment
               key={comment.comment_id ? comment.comment_id : `temp-${index}`}
               comment={comment}
+              onDelete={onDelete}
             />
           ))
         ) : (
