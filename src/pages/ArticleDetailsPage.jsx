@@ -10,48 +10,78 @@ function ArticleDetailsPage() {
   const { article_id } = useParams();
   const [article, setArticle] = useState(null);
   const [comments, setComments] = useState([]);
-  console.log("Current state of comments:", comments);
   const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState("");
 
-  useEffect(() => {
-    getArticleById(article_id)
-      .then(setArticle)
-      .catch(() => {
-        setError("Failed to load article.");
-      });
-
-    getCommentsByArticleId(article_id)
-      .then((fetchedComments) => {
-        setComments((prevComments) => {
-          const existingCommentIds = new Set(
-            prevComments.map((c) => c.comment_id)
-          );
-          const newUniqueComments = fetchedComments.filter(
-            (c) => !existingCommentIds.has(c.comment_id)
-          );
-          return [...prevComments, ...newUniqueComments];
+  useEffect(
+    function fetchData() {
+      getArticleById(article_id)
+        .then(setArticle)
+        .catch(function handleError() {
+          setError("Failed to load article.");
         });
-      })
-      .catch(() => setError("Failed to load comments."));
-  }, [article_id]);
+
+      getCommentsByArticleId(article_id)
+        .then(function handleFetchedComments(fetchedComments) {
+          setComments(function updateComments(prevComments) {
+            const existingCommentIds = new Set(
+              prevComments.map(function mapComments(c) {
+                return c.comment_id;
+              })
+            );
+            const newUniqueComments = fetchedComments.filter(
+              function filterComments(c) {
+                return !existingCommentIds.has(c.comment_id);
+              }
+            );
+            return [...prevComments, ...newUniqueComments];
+          });
+        })
+        .catch(function handleCommentError() {
+          setError("Failed to load comments.");
+        });
+    },
+    [article_id]
+  );
 
   function handleVoteUpdate(newVotes) {
-    setArticle((prevArticle) => ({
-      ...prevArticle,
-      votes: newVotes,
-    }));
+    setArticle(function updateArticle(prevArticle) {
+      return { ...prevArticle, votes: newVotes };
+    });
   }
 
   function handleNewComment(newComment) {
-    setComments((prevComments) => [newComment, ...prevComments]);
+    setComments(function updateComments(prevComments) {
+      return [newComment, ...prevComments];
+    });
 
-    setTimeout(() => {
+    setTimeout(function refreshComments() {
       getCommentsByArticleId(article_id).then(setComments);
     }, 1000);
   }
 
+  function handleDeleteComment(commentId) {
+    setComments((prevComments) =>
+      prevComments.filter((comment) => comment.comment_id !== commentId)
+    );
+    setSuccessMessage("Comment successfully deleted.");
+    setTimeout(() => {
+      setSuccessMessage("");
+    }, 3000);
+  }
+
   if (error) return <p className="text-red-500">{error}</p>;
-  if (!article) return <p>Loading article...</p>;
+
+  if (!article) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen">
+        <div className="spinner mb-4"></div>
+        <p className="text-xl font-bold text-blue-800">
+          Loading article details...
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto p-4">
@@ -69,7 +99,14 @@ function ArticleDetailsPage() {
       </div>
 
       <CommentForm articleId={article_id} onCommentAdded={handleNewComment} />
-      <CommentsSection comments={comments} articleId={article_id} />
+
+      {successMessage && (
+        <div className="mt-2 text-green-600 font-semibold">
+          {successMessage}
+        </div>
+      )}
+
+      <CommentsSection comments={comments} onDelete={handleDeleteComment} />
     </div>
   );
 }
