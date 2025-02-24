@@ -1,11 +1,12 @@
 import React from "react";
 
-const validSortBy = ["created_at", "votes", "article_id"];
+const validSortBy = ["created_at", "votes", "article_id", "comment_count"];
 
 const sortLabels = {
   created_at: "Sort by Date",
   votes: "Sort by Votes",
   article_id: "Sort by ID",
+  comment_count: "Sort by Comments",
 };
 
 function SortOptions({ setSortBy, setSortOrder, sortBy, sortOrder }) {
@@ -82,6 +83,18 @@ function SortOptions({ setSortBy, setSortOrder, sortBy, sortOrder }) {
           {sortBy === "topic" && sortOrder === "asc"
             ? "Sort Topic: Z-A"
             : "Sort Topic: A-Z"}
+        </button>
+        <button
+          className={`px-4 py-2 border rounded ${
+            sortBy === "comment_count" && sortOrder === "asc"
+              ? "bg-yellow-500"
+              : "bg-yellow-400"
+          } hover:bg-yellow-500 text-white`}
+          onClick={() => toggleSortOrder("comment_count")}
+        >
+          {sortBy === "comment_count" && sortOrder === "asc"
+            ? "Sort Comments: High-Low"
+            : "Sort Comments: Low-High"}
         </button>
       </div>
     </div>
