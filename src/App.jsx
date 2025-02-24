@@ -6,6 +6,8 @@ import HomePage from "./pages/HomePage";
 import ArticleDetailsPage from "./pages/ArticleDetailsPage";
 import LoginPage from "./pages/LoginPage";
 import ScrollToTop from "./components/ScrollToTop";
+import TopicsPage from "./pages/TopicsPage";
+import TopicArticlesPage from "./pages/TopicsArticlesPage";
 
 const App = () => {
   return (
@@ -22,6 +24,8 @@ const App = () => {
               element={<ArticleDetailsPage />}
             />
             <Route path="/login" element={<LoginPage />} />{" "}
+            <Route path="/topics" element={<TopicsPage />} />
+            <Route path="/topics/:topic" element={<TopicArticlesPage />} />
           </Routes>
         </div>
       </div>

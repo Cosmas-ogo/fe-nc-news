@@ -98,6 +98,32 @@ function deleteComment(commentId) {
     });
 }
 
+function fetchTopics() {
+  return axios
+    .get(`${API_URL}/topics`)
+    .then(function (response) {
+      return response.data.topics;
+    })
+    .catch(function (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to fetch topics"
+      );
+    });
+}
+
+function fetchArticlesByTopic(topic) {
+  return axios
+    .get(`${API_URL}/articles?topic=${topic}`)
+    .then(function (response) {
+      return response.data.articles;
+    })
+    .catch(function (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to fetch articles for topic"
+      );
+    });
+}
+
 export {
   getArticleById,
   getCommentsByArticleId,
@@ -105,4 +131,6 @@ export {
   postComment,
   updateArticleVotes,
   deleteComment,
+  fetchTopics,
+  fetchArticlesByTopic,
 };
