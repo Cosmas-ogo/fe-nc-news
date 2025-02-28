@@ -17,8 +17,12 @@ function TopicArticlesPage() {
           setArticles(data);
           setIsLoading(false);
         })
-        .catch(function (err) {
-          setError("Failed to load articles.");
+        .catch(function (error) {
+          if (error.response && err.response.status === 404) {
+            setError("Topic not found.");
+          } else {
+            setError("Failed to load articles.");
+          }
           setIsLoading(false);
         });
     },
@@ -36,6 +40,15 @@ function TopicArticlesPage() {
 
   if (error) {
     return <p className="text-red-500 text-center">{error}</p>;
+  }
+  if (!isLoading && articles.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen">
+        <p className="text-xl font-bold text-red-600">
+          No articles found for topic "{topic}".
+        </p>
+      </div>
+    );
   }
 
   return (

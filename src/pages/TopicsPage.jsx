@@ -13,8 +13,8 @@ function TopicsPage() {
         setTopics(data);
         setIsLoading(false);
       })
-      .catch(function (err) {
-        setError(err);
+      .catch(function (error) {
+        setError(error);
         setIsLoading(false);
       });
   }, []);
@@ -32,6 +32,15 @@ function TopicsPage() {
       <div className="flex items-center justify-center min-h-screen bg-gray-100">
         <p className="text-xl font-semibold text-red-600">
           Error loading topics: {error.message}
+        </p>
+      </div>
+    );
+  }
+  if (!isLoading && topics.length === 0) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-100">
+        <p className="text-xl font-semibold text-red-600">
+          No topics available.
         </p>
       </div>
     );
