@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { postComment } from "../services/api";
 
 function CommentForm({ articleId, onCommentAdded }) {
@@ -6,23 +6,39 @@ function CommentForm({ articleId, onCommentAdded }) {
   const [username, setUsername] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (username.trim() && commentText.trim()) {
+      setError("");
+    }
+  }, [username, commentText]);
 
   function handleSubmit(e) {
     e.preventDefault();
     if (!commentText.trim() || !username.trim()) {
+      setError("Please fill out all required fields.");
       return;
     }
 
     setIsSubmitting(true);
     setSuccess("");
+    setError("");
 
-    postComment(articleId, username, commentText, onCommentAdded, setSuccess)
+    postComment(
+      articleId,
+      username,
+      commentText,
+      onCommentAdded,
+      setSuccess,
+      setError
+    )
       .then(() => {
         setCommentText("");
         setUsername("");
       })
       .catch((error) => {
-        console.error("Error posting comment:", error);
+        setError("An unexpected error occurred. Please try again.");
       })
       .finally(() => {
         setIsSubmitting(false);
@@ -40,7 +56,6 @@ function CommentForm({ articleId, onCommentAdded }) {
         placeholder="Your Name"
         value={username}
         onChange={(e) => setUsername(e.target.value)}
-        required
         disabled={isSubmitting}
       />
       <textarea
@@ -48,7 +63,6 @@ function CommentForm({ articleId, onCommentAdded }) {
         placeholder="Write a comment..."
         value={commentText}
         onChange={(e) => setCommentText(e.target.value)}
-        required
         disabled={isSubmitting}
       ></textarea>
       <button
@@ -59,6 +73,11 @@ function CommentForm({ articleId, onCommentAdded }) {
         {isSubmitting ? "Posting..." : "Post Comment"}
       </button>
       {success && <p className="text-green-500 mt-2">{success}</p>}
+      {error && (
+        <p className="text-red-500 mt-2" aria-live="assertive">
+          {error}
+        </p>
+      )}
     </form>
   );
 }

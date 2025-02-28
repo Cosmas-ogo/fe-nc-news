@@ -17,8 +17,12 @@ function ArticleDetailsPage() {
     function fetchData() {
       getArticleById(article_id)
         .then(setArticle)
-        .catch(function handleError() {
-          setError("Failed to load article.");
+        .catch(function handleError(error) {
+          if (error.response && error.response.status === 404) {
+            setError("Article not found.");
+          } else {
+            setError("Failed to load article.");
+          }
         });
 
       getCommentsByArticleId(article_id)

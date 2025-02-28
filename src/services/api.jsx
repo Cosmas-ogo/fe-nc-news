@@ -9,6 +9,9 @@ function getArticleById(articleId) {
       return response.data.article;
     })
     .catch(function (error) {
+      if (error.response && error.response.status === 404) {
+        throw new Error("Article not found.");
+      }
       throw new Error(
         error.response?.data?.message || "Failed to fetch article"
       );
@@ -43,7 +46,14 @@ function getValidUsernames() {
     });
 }
 
-function postComment(articleId, username, body, updateComments, setSuccess) {
+function postComment(
+  articleId,
+  username,
+  body,
+  updateComments,
+  setSuccess,
+  setError
+) {
   return getValidUsernames()
     .then(function (validUsernames) {
       if (!validUsernames.includes(username)) {
@@ -71,7 +81,11 @@ function postComment(articleId, username, body, updateComments, setSuccess) {
       });
     })
     .catch(function (error) {
-      console.error("Failed to post comment:", error);
+      setError("Invalid Username! Can not Post Comment");
+
+      setTimeout(() => {
+        setError("");
+      }, 3000);
     });
 }
 
@@ -118,6 +132,9 @@ function fetchArticlesByTopic(topic) {
       return response.data.articles;
     })
     .catch(function (error) {
+      if (error.response && error.response.status === 404) {
+        throw new Error("Topic not found.");
+      }
       throw new Error(
         error.response?.data?.message || "Failed to fetch articles for topic"
       );
